@@ -37,8 +37,24 @@ class ProductsProvider with ChangeNotifier {
     ),
   ];
 
+  // application-wide filter: results same for all screens
+  var _showFavorites = false;
+
   List<Product> get items {
+    if (_showFavorites) {
+      return _items.where((element) => element.isFavorite).toList();
+    }
     return [..._items];
+  }
+
+  void showFavoritesOnly() {
+    _showFavorites = true;
+    notifyListeners();
+  }
+
+  void showAll() {
+    _showFavorites = false;
+    notifyListeners();
   }
 
   Product findById(String productId) {
