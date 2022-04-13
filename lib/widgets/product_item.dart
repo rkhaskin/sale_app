@@ -8,7 +8,10 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context);
+    final product = Provider.of<Product>(context, listen: false);
+    print('vvvvvvvv');
+    // save context which has our scheme. The one created in Consumer builder has a different scheme
+    final ctx = context;
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -23,12 +26,16 @@ class ProductItem extends StatelessWidget {
         footer: GridTileBar(
           title: Text(product.title),
           backgroundColor: Colors.black87,
-          leading: IconButton(
-            icon: Icon(product.isFavorite ? Icons.favorite : Icons.star_border),
-            onPressed: () {
-              product.toggleFavorite();
-            },
-            color: Theme.of(context).colorScheme.secondary,
+          leading: Consumer<Product>(
+            builder: (context, product, child) => IconButton(
+              icon:
+                  Icon(product.isFavorite ? Icons.favorite : Icons.star_border),
+              onPressed: () {
+                product.toggleFavorite();
+              },
+              // use saved original context
+              color: Theme.of(ctx).colorScheme.secondary,
+            ),
           ),
           trailing: IconButton(
             icon: const Icon(
