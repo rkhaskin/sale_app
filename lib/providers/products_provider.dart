@@ -36,25 +36,12 @@ class ProductsProvider with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
   ];
-
-  // application-wide filter: results same for all screens
-  var _showFavorites = false;
-
   List<Product> get items {
-    if (_showFavorites) {
-      return _items.where((element) => element.isFavorite).toList();
-    }
     return [..._items];
   }
 
-  void showFavoritesOnly() {
-    _showFavorites = true;
-    notifyListeners();
-  }
-
-  void showAll() {
-    _showFavorites = false;
-    notifyListeners();
+  List<Product> get favoriteItems {
+    return _items.where((element) => element.isFavorite).toList();
   }
 
   Product findById(String productId) {

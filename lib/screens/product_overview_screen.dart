@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/products_provider.dart';
 
 import '../widgets/products_grid_view.dart';
 
 // ignore: constant_identifier_names
 enum FilterOptions { Favorites, All }
 
-class ProductOverviewScreen extends StatelessWidget {
+class ProductOverviewScreen extends StatefulWidget {
   const ProductOverviewScreen({Key? key}) : super(key: key);
 
   @override
+  State<ProductOverviewScreen> createState() => _ProductOverviewScreenState();
+}
+
+class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
+  var _showFavoritesOnly = false;
+  @override
   Widget build(BuildContext context) {
-    final productsProvider =
-        Provider.of<ProductsProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shop'),
@@ -22,11 +24,13 @@ class ProductOverviewScreen extends StatelessWidget {
             margin: EdgeInsets.only(right: 50),
             child: PopupMenuButton(
               onSelected: (FilterOptions value) {
-                if (value == FilterOptions.Favorites) {
-                  productsProvider.showFavoritesOnly();
-                } else {
-                  productsProvider.showAll();
-                }
+                setState(() {
+                  if (value == FilterOptions.Favorites) {
+                    _showFavoritesOnly = true;
+                  } else {
+                    _showFavoritesOnly = false;
+                  }
+                });
               },
               itemBuilder: (_) => const [
                 PopupMenuItem(
@@ -40,7 +44,7 @@ class ProductOverviewScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const ProductsGridView(),
+      body: ProductsGridView(_showFavoritesOnly),
     );
   }
 }
