@@ -19,16 +19,17 @@ class ProductsGridView extends StatelessWidget {
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       itemCount: products.length,
+      // use existing producsProvider object -> use ChangeNotifierProvider.value
+      itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
+        // this product will ve accessible from child ProductItem
+        value: products[i],
+        child: const ProductItem(),
+      ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 3 / 2,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-      ),
-      // use existing producsProvider object -> use ChangeNotifierProvider.value
-      itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
-        value: products[i],
-        child: const ProductItem(),
       ),
     );
   }

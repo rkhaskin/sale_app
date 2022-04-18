@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import '../providers/cart_provider.dart';
+import '../screens/cart_screen.dart';
 import '../widgets/products_grid_view.dart';
+import '../widgets/badge.dart';
+import '../widgets/app_drawer.dart';
 
 // ignore: constant_identifier_names
 enum FilterOptions { Favorites, All }
@@ -20,30 +24,51 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
       appBar: AppBar(
         title: const Text('Shop'),
         actions: [
-          Container(
-            margin: EdgeInsets.only(right: 50),
-            child: PopupMenuButton(
-              onSelected: (FilterOptions value) {
-                setState(() {
-                  if (value == FilterOptions.Favorites) {
-                    _showFavoritesOnly = true;
-                  } else {
-                    _showFavoritesOnly = false;
-                  }
-                });
-              },
-              itemBuilder: (_) => const [
-                PopupMenuItem(
-                    child: Text('Only Favorites'),
-                    value: FilterOptions.Favorites),
-                PopupMenuItem(
-                    child: Text('All items'), value: FilterOptions.All)
-              ],
-              icon: Icon(Icons.more_vert),
-            ),
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (FilterOptions value) {
+              setState(() {
+                if (value == FilterOptions.Favorites) {
+                  _showFavoritesOnly = true;
+                } else {
+                  _showFavoritesOnly = false;
+                }
+              });
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                child: Text('Only Favorites'),
+                value: FilterOptions.Favorites,
+              ),
+              PopupMenuItem(
+                child: Text('All items'),
+                value: FilterOptions.All,
+              )
+            ],
           ),
+          Container(
+            margin: const EdgeInsets.only(right: 50),
+            child: Consumer<Cart>(
+              builder: (context, cart, ch) => Badge(
+                child: ch!,
+                value: cart.itemCount.toString(),
+              ),
+              // this will be passed as a "ch" argument to the Consumer, and then to the builder.
+              // Builder will pass the child param to the widget
+              // the code below is outside the builder, so it will not be rebuilt.
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    CartScreen.routeName,
+                  );
+                },
+              ),
+            ),
+          )
         ],
       ),
+      drawer: const AppDrawer(),
       body: ProductsGridView(_showFavoritesOnly),
     );
   }
