@@ -5,6 +5,7 @@ import '../screens/cart_screen.dart';
 import '../widgets/products_grid_view.dart';
 import '../widgets/badge.dart';
 import '../widgets/app_drawer.dart';
+import '../providers/products_provider.dart';
 
 // ignore: constant_identifier_names
 enum FilterOptions { Favorites, All }
@@ -18,6 +19,19 @@ class ProductOverviewScreen extends StatefulWidget {
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   var _showFavoritesOnly = false;
+
+  @override
+  void initState() {
+    // this will not work. Initialization of the class and linkage to Provider is not yet completed.
+    /* Provider.of<ProductsProvider>(context).fetchProducts(); */
+    Future.delayed(Duration.zero, () {
+      // this will work, as we use future callback, which gets executed after all sync methods are run
+      Provider.of<ProductsProvider>(context, listen: false).fetchProducts();
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
