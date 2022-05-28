@@ -13,44 +13,47 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  var _isLoading = false;
-  @override
-  // void initState() {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //   Future.delayed(Duration.zero).then((_) async {
-  //     // if inside initState I use provider call with listen: false, I do not need to ue Future.delayed.
-  //     await Provider.of<Orders>(context, listen: false).fetchOrders();
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   });
-  //   super.initState();
-  // }
+  Future? _orders;
 
+  Future _obtainOrders() {
+    return Provider.of<Orders>(context, listen: false).fetchOrders();
+  }
+
+  @override
   void initState() {
-    _isLoading = true;
-    // if inside initState I use provider call with listen: false, I do not need to ue Future.delayed.
-    Provider.of<Orders>(context, listen: false).fetchOrders().then((_) {
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    _orders = _obtainOrders();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final orderProvider = Provider.of<Orders>(context);
+    // final orderProvider = Provider.of<Orders>(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Your Orders')),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: orderProvider.orders.length,
-              itemBuilder: (ctx, i) => OrderItem(orderProvider.orders[i]),
-            ),
+      // manages loading state for us. No need to copnvert widget to stateful just for loading state
+      body: FutureBuilder(
+        // no new future is created just because my widget rebuilds
+        future: _orders,
+        builder: (ctx, dataSnapshot) {
+          if (dataSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (dataSnapshot.hasError) {
+            // do error handling
+            return const Center(child: Text("Error occured"));
+          } else {
+            return Consumer<Orders>(
+              builder: (ctx, orderProvider, _) {
+                return ListView.builder(
+                  itemCount: orderProvider.orders.length,
+                  itemBuilder: (ctx, i) => OrderItem(orderProvider.orders[i]),
+                );
+              },
+            );
+          }
+        },
+      ),
       drawer: const AppDrawer(),
     );
   }
