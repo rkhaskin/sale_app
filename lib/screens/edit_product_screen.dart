@@ -83,7 +83,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     setState(() {});
   }
 
-  void _saveForm() {
+  void _saveForm() async {
     bool isValid = _form.currentState?.validate() ?? false;
     if (!isValid) {
       return;
@@ -93,16 +93,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
       _isLoading = true;
     });
     if (_editedProduct.id.isNotEmpty) {
-      Provider.of<ProductsProvider>(context, listen: false)
+      await Provider.of<ProductsProvider>(context, listen: false)
           .updateProduct(_editedProduct);
-      setState(() {
-        _isLoading = false;
-      });
     } else {
-      Provider.of<ProductsProvider>(context, listen: false)
+      await Provider.of<ProductsProvider>(context, listen: false)
           .addProduct(_editedProduct)
-          .catchError((error) {
-        return showDialog(
+          .catchError((error) async {
+        await showDialog(
             context: context,
             builder: (ctx) {
               return AlertDialog(
@@ -117,14 +114,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ],
               );
             });
-      }).then((_) {
-        // will be executed once alert is not shown at all or closed
-        Navigator.of(context).pop();
-        setState(() {
-          _isLoading = false;
-        });
       });
     }
+    Navigator.of(context).pop();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override

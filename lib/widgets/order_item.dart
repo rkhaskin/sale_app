@@ -20,7 +20,8 @@ class _OrderItemState extends State<OrderItem> {
       margin: const EdgeInsets.all(10),
       child: Column(children: [
         ListTile(
-          title: Text('Total is \$${widget.orderData.total}'),
+          title: Text(
+              'Total is \$${double.parse(widget.orderData.total.toStringAsFixed(2))}'),
           subtitle: Text(
             DateFormat('dd-MM-yyyy hh:mm')
                 .format(widget.orderData.orderDateTime),
