@@ -38,25 +38,7 @@ class CartScreen extends StatelessWidget {
                     ),
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                        // convert from Map<String, CartItem> to List<CartItem>
-                        cart.items.values.toList(),
-                        cart.calculateTotal,
-                      );
-                      cart.clear();
-                    },
-                    child: const Text('Order Now!'),
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.resolveWith<Color?>(
-                        (_) {
-                          return Theme.of(context).colorScheme.primary;
-                        },
-                      ),
-                    ),
-                  ),
+                  OrderButton(cart: cart),
                 ],
               ),
             ),
@@ -81,6 +63,53 @@ class CartScreen extends StatelessWidget {
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key? key,
+    required this.cart,
+  }) : super(key: key);
+
+  final provider_ci.Cart cart;
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  bool _isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      // if total amount not greater than 0, disable the button: button is disabled if onPressed has no function to point to
+      onPressed: (widget.cart.calculateTotal <= 0 || _isLoading)
+          ? null
+          : () async {
+              setState(() {
+                _isLoading = true;
+              });
+              await Provider.of<Orders>(context, listen: false).addOrder(
+                // convert from Map<String, CartItem> to List<CartItem>
+                widget.cart.items.values.toList(),
+                widget.cart.calculateTotal,
+              );
+              setState(() {
+                _isLoading = false;
+              });
+              widget.cart.clear();
+            },
+      child:
+          _isLoading ? CircularProgressIndicator() : const Text('Order Now!'),
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+          (_) {
+            return Theme.of(context).colorScheme.primary;
+          },
+        ),
       ),
     );
   }
